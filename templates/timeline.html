@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Tenna Code Archive</title>
+        {% include 'partials/head.html' %}
+        <link rel="stylesheet" href="{{ assets['timeline.css'] }}" />
+        <script type="module" src="{{ assets['timeline.js'] }}"></script>
+    </head>
+    <body class="timeline-page">
+        {% include 'partials/brand.html' %}
+
+        <main id="main" tabindex="-1" class="timeline-main">
+            <h1 class="visually-hidden">{{ game }} release timeline</h1>
+            <div id="timeline-loading" class="panel-muted timeline-status" role="status">Loading timeline…</div>
+            <div id="timeline-error" class="panel-muted timeline-status timeline-error" role="alert" hidden></div>
+
+            <p id="timeline-relationship-summary" class="visually-hidden"></p>
+
+            <section id="timeline-container" class="timeline-section" aria-label="{{ game }} release timeline" hidden>
+                <div id="timeline-scroll" class="timeline-scroll" role="region" aria-label="Chapter revisions by release" tabindex="0">
+                    <div id="timeline-canvas" class="timeline-canvas" role="table"></div>
+                </div>
+                <div id="timeline-scrollbar" class="timeline-scrollbar" aria-hidden="true" tabindex="-1">
+                    <div id="timeline-scrollbar-track" class="timeline-scrollbar-track"></div>
+                </div>
+            </section>
+        </main>
+
+    </body>
+</html>

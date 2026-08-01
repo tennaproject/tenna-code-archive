@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" data-search-worker="{{ assets['search-worker.js'] }}">
+    <head>
+        <title>{{ chapter_label }} - Tenna Code Archive</title>
+        {% include 'partials/head.html' %}
+        <link rel="stylesheet" href="{{ assets['github-dark.min.css'] }}" />
+        <link rel="stylesheet" href="{{ assets['script-list.css'] }}" />
+        <link rel="stylesheet" href="{{ assets['chapter.css'] }}" />
+        <link rel="preload" href="/data/catalog.json" as="fetch" crossorigin />
+        <script type="module" src="{{ assets['search.js'] }}"></script>
+        <script type="module" src="{{ assets['chapter.js'] }}"></script>
+    </head>
+    <body>
+        {% include 'partials/brand.html' %}
+        <main id="main" tabindex="-1">
+            <div class="page-heading">
+                <nav class="page-heading-nav" aria-label="Page">
+                    <a class="ui-button ui-button-ghost ui-icon-back" href="/">Timeline</a>
+                </nav>
+                <div class="page-heading-copy">
+                    <h1>{{ chapter_label }}</h1>
+                </div>
+                <div class="page-heading-actions">
+                    <label class="release-picker">Release <select id="chapter-release" disabled></select></label>
+                    <a class="ui-button ui-button-ghost ui-icon-compare" href="/compare.html?chapter={{ chapter_id }}">Compare releases</a>
+                </div>
+            </div>
+
+            <div id="chapter-search">{% include 'partials/search.html' %}</div>
+
+            <div id="script-sections" aria-busy="true">
+                <p class="panel-muted" id="script-sections-status" role="status" aria-live="polite">Loading scripts…</p>
+            </div>
+        </main>
+
+    </body>
+</html>

@@ -1,0 +1,412 @@
+.timeline-page {
+  --overlay-surface: color-mix(in oklch, var(--surface-1) 82%, transparent);
+  --overlay-blur: saturate(140%) blur(12px);
+}
+
+.timeline-page .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--overlay-surface);
+  border-bottom: 1px solid var(--divider-color);
+  backdrop-filter: var(--overlay-blur);
+  -webkit-backdrop-filter: var(--overlay-blur);
+}
+
+.timeline-page #site-meta {
+  gap: 0.25rem 1rem;
+}
+
+.timeline-main {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0;
+  background: var(--surface-2);
+  padding: 0;
+}
+
+.timeline-status {
+  margin: 1.5rem;
+  min-height: 3rem;
+}
+
+.timeline-error {
+  border-color: color-mix(in oklch, var(--red) 55%, var(--border-color));
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.timeline-section:not([hidden]) {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.timeline-scroll {
+  --timeline-label-width: 14rem;
+  --timeline-column-width: 9.5rem;
+  --timeline-axis-height: 5.25rem;
+  --timeline-row-height: 5rem;
+  --node-size: 1.5rem;
+  position: relative;
+  flex: 1 0 auto;
+  overflow-x: auto;
+  background: var(--surface-2);
+  cursor: grab;
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+.timeline-scroll.is-dragging,
+.timeline-scroll.is-dragging * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+.timeline-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.timeline-scroll:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: -2px;
+}
+
+.timeline-scrollbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-top: 1px solid var(--divider-color);
+  background: var(--overlay-surface);
+  backdrop-filter: var(--overlay-blur);
+  -webkit-backdrop-filter: var(--overlay-blur);
+  overscroll-behavior-inline: contain;
+}
+
+.timeline-scrollbar-track {
+  height: 1px;
+}
+
+.timeline-canvas {
+  position: relative;
+  width: max(
+    100%,
+    calc(var(--timeline-label-width) + var(--release-count) * var(--timeline-column-width))
+  );
+  min-width: max-content;
+}
+
+.timeline-axis,
+.timeline-row {
+  display: grid;
+  grid-template-columns: var(--timeline-label-width) 1fr;
+}
+
+.timeline-axis {
+  position: relative;
+  z-index: 6;
+  min-height: var(--timeline-axis-height);
+  border-bottom: 1px solid var(--divider-color);
+  background: var(--surface-3);
+}
+
+.timeline-axis-label,
+.timeline-chapter {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 5;
+  border-inline-end: 1px solid var(--divider-color);
+  padding: 0.75rem 1rem;
+  background: var(--surface-3);
+}
+
+.timeline-axis-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.timeline-axis-label small {
+  color: var(--text-2);
+  font-size: var(--text-xs);
+}
+
+.timeline-releases,
+.timeline-track {
+  display: grid;
+  grid-template-columns: repeat(var(--release-count), var(--timeline-column-width));
+}
+
+.timeline-release {
+  display: flex;
+  min-width: 0;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  border-inline-end: 1px solid var(--divider-color);
+  padding: 0.65rem 0.75rem;
+}
+
+.timeline-release strong,
+.timeline-release small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-release strong {
+  font-size: var(--text-sm);
+}
+
+.timeline-release small {
+  color: var(--text-2);
+  font-size: var(--text-xs);
+}
+
+.timeline-row {
+  min-height: var(--timeline-row-height);
+  border-bottom: 1px solid var(--divider-color);
+}
+
+.timeline-row:last-child {
+  border-bottom: 0;
+}
+
+.timeline-chapter {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  background: var(--surface-2);
+  font-size: var(--text-base);
+  line-height: 1.2;
+}
+
+.timeline-row:hover .timeline-chapter,
+.timeline-row:hover .timeline-track {
+  background-color: var(--surface-2-hover);
+}
+
+.timeline-track {
+  position: relative;
+  min-height: var(--timeline-row-height);
+  background: var(--surface-2);
+  transition: background-color 0.15s ease;
+}
+
+.timeline-track::after {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--timeline-column-width) / 2);
+  left: calc(var(--timeline-column-width) / 2);
+  height: 1px;
+  background: var(--divider-color);
+  content: "";
+  pointer-events: none;
+}
+
+.timeline-track-cell {
+  min-width: 0;
+  border-inline-end: 1px solid var(--divider-color);
+}
+
+.timeline-node,
+.timeline-connector {
+  position: absolute;
+  top: 50%;
+  color: var(--red);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.timeline-node {
+  z-index: 3;
+}
+
+.timeline-connector {
+  z-index: 2;
+}
+
+.timeline-node {
+  left: calc((var(--release-index) + 0.5) * var(--timeline-column-width));
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  transform: translate(-50%, -50%);
+  align-items: center;
+  justify-content: center;
+}
+
+.timeline-node::after {
+  position: absolute;
+  inset: -0.5rem;
+  content: "";
+}
+
+.timeline-node-square {
+  width: var(--node-size);
+  height: var(--node-size);
+  border: 1px solid color-mix(in oklch, var(--red) 70%, var(--border-color));
+  background: var(--red);
+  box-shadow: 0 0 0 3px var(--surface-2);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.timeline-node-version {
+  position: absolute;
+  top: calc(50% + var(--node-size) / 2 + 0.3rem);
+  max-width: calc(var(--timeline-column-width) - 1rem);
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: var(--text-xs);
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-node:hover,
+.timeline-node:focus-visible,
+.timeline-connector:hover,
+.timeline-connector:focus-visible {
+  color: var(--red-hover);
+}
+
+.timeline-node:hover,
+.timeline-node:focus-visible {
+  z-index: 4;
+}
+
+.timeline-node:hover .timeline-node-square,
+.timeline-node:focus-visible .timeline-node-square {
+  border-color: var(--red-hover);
+  background: var(--red-hover);
+  transform: scale(1.2);
+}
+
+.timeline-node:focus-visible,
+.timeline-connector:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: 2px;
+}
+
+.timeline-connector {
+  left: calc((var(--from-index) + 0.5) * var(--timeline-column-width) + var(--node-size) / 2 + 4px);
+  width: calc(
+    (var(--to-index) - var(--from-index)) * var(--timeline-column-width) - var(--node-size) - 8px
+  );
+  height: 2.25rem;
+  transform: translateY(-50%);
+}
+
+.timeline-connector::before {
+  position: absolute;
+  top: calc(50% - 1px);
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: currentColor;
+  content: "";
+}
+
+.timeline-relationships {
+  position: absolute;
+  top: var(--timeline-axis-height);
+  inset-inline-start: var(--timeline-label-width);
+  z-index: 1;
+  width: calc(var(--release-count) * var(--timeline-column-width));
+  height: calc(var(--timeline-row-count) * var(--timeline-row-height));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.timeline-relationships path {
+  fill: none;
+  stroke: color-mix(in oklch, var(--text-3) 80%, transparent);
+  stroke-dasharray: 5 5;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-width: 2px;
+}
+
+.timeline-tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.35rem);
+  left: 50%;
+  z-index: 10;
+  display: flex;
+  width: max-content;
+  max-width: 17rem;
+  flex-direction: column;
+  gap: 0.15rem;
+  border: 1px solid var(--border-color);
+  background: var(--surface-4);
+  box-shadow: var(--shadow-lg);
+  padding: 0.45rem 0.6rem;
+  color: var(--text-1);
+  font-size: var(--text-xs);
+  line-height: 1.2;
+  opacity: 0;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  transform: translateX(-50%);
+  visibility: hidden;
+}
+
+.timeline-tooltip span {
+  color: var(--text-2);
+  font-family: var(--font-sans);
+}
+
+.timeline-node:hover .timeline-tooltip:not([data-floating-popover]),
+.timeline-node:focus-visible .timeline-tooltip:not([data-floating-popover]),
+.timeline-connector:hover .timeline-tooltip:not([data-floating-popover]),
+.timeline-connector:focus-visible .timeline-tooltip:not([data-floating-popover]) {
+  opacity: 1;
+  visibility: visible;
+}
+
+.timeline-tooltip[data-floating-popover][data-open] {
+  position: fixed;
+  inset: auto;
+  right: auto;
+  bottom: auto;
+  z-index: 1000000;
+  box-sizing: border-box;
+  width: max-content;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: min(17rem, calc(100vw - 1rem));
+  max-height: calc(100vh - 1rem);
+  margin: 0;
+  overflow: visible;
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}
+
+.timeline-empty {
+  padding: 1rem;
+  color: var(--text-2);
+}
+
+@media screen and (max-width: 720px) {
+  .timeline-scroll {
+    --timeline-label-width: 10rem;
+    --timeline-column-width: 8rem;
+  }
+
+  .timeline-axis-label,
+  .timeline-chapter {
+    padding-inline: 0.75rem;
+  }
+}

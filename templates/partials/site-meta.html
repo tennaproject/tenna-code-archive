@@ -1,0 +1,23 @@
+<div id="site-meta">
+    <div class="meta-line">
+        <ul class="comma-list">
+            {% for text, link in links %}
+                <li><a href="{{ link }}">{{ text }}</a></li>
+            {% endfor %}
+        </ul>
+
+        <p class="credit">
+            by <a href="https://github.com/jjezewski">jjezewski</a>, a fork of
+            <a href="https://github.com/utdrwiki/code-viewer">code-viewer</a> by
+            <a href="https://github.com/Xkeeper0">xkeeper</a>,
+            <a href="https://github.com/Grossley">Grossley</a>,
+            <a href="https://github.com/Jacky720">Jacky720</a>,
+            <a href="https://kocka.tech">KockaAdmiralac</a> and
+            <a href="https://github.com/RedstoneWizard08">RedstoneWizard08</a>
+        </p>
+    </div>
+
+    {% if footer %}
+        <p class="legal">{{ footer }}</p>
+    {% endif %}
+</div>

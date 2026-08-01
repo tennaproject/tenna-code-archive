@@ -1,0 +1,12 @@
+.entity-reference {
+  border: 1px solid color-mix(in oklch, var(--green) 40%, transparent);
+  background: var(--room-background-color);
+  color: var(--room-text-color);
+  padding: 0 0.5em;
+}
+
+.entity-description {
+  color: var(--room-description-text-color);
+  font-style: italic;
+  user-select: none;
+}

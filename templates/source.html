@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noindex">
+        <meta name="shard-prefix-length" content="{{ shard_prefix_length }}">
+        <title>Raw source - Tenna Code Archive</title>
+        <style>
+            :root { color-scheme: dark; }
+            body {
+                margin: 0;
+                background: #211f2b;
+                color: #f1f1f1;
+            }
+            pre {
+                box-sizing: border-box;
+                max-width: 100%;
+                margin: 0;
+                padding: 1rem;
+                overflow: auto;
+                white-space: pre;
+                font: 13px/1.45 ui-monospace, monospace;
+            }
+        </style>
+        <script type="module" src="{{ assets['source.js'] }}"></script>
+    </head>
+    <body>
+        <pre id="source-code" aria-busy="true">Loading source…</pre>
+    </body>
+</html>

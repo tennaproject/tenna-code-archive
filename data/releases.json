@@ -1,0 +1,109 @@
+{
+  "deltarune": {
+    "label": "DELTARUNE",
+    "directory": "deltarune",
+    "appId": "1671210",
+    "depotId": "1671212",
+    "releases": [
+      { "date": "2026-07-31", "manifest": "2054633419585385858" },
+      { "date": "2026-07-22", "manifest": "6988415462459025370" },
+      { "date": "2026-07-09", "manifest": "7477373076840518223" },
+      { "date": "2026-07-01", "manifest": "8959018571141829552" },
+      { "date": "2026-06-29", "manifest": "1619878865915573883" },
+      { "date": "2026-06-27", "manifest": "5668370237506127426" },
+      { "date": "2026-06-25", "manifest": "4986929572195566736" },
+      { "date": "2026-06-24", "manifest": "2856471167011435804" },
+      {
+        "date": "2025-08-26",
+        "manifest": "8692203871714066779",
+        "branch": "deltarune105",
+        "note": "1.05 beta"
+      },
+      { "date": "2025-08-05", "manifest": "5291565625263756968" },
+      { "date": "2025-07-23", "manifest": "6956536201257221797" },
+      { "date": "2025-07-08", "manifest": "1738457575886606060" },
+      { "date": "2025-06-09", "manifest": "3006447521106301427" },
+      { "date": "2025-06-08", "manifest": "7730842116999772152" },
+      { "date": "2025-06-06", "manifest": "7360369116571903144" },
+      { "date": "2025-06-04", "manifest": "6530852604090871226" }
+    ]
+  },
+  "deltarune-demo": {
+    "label": "DELTARUNE Demo",
+    "directory": "deltarune_demo",
+    "appId": "1690940",
+    "depotId": "1690941",
+    "singleChapter": "demo",
+    "releases": [
+      {
+        "date": "2024-12-09",
+        "manifest": "986349265606924702",
+        "branch": "chapter1.2.lts.test",
+        "note": "LTS test",
+        "branchHead": true
+      },
+      {
+        "date": "2024-11-26",
+        "manifest": "2185907323585193862",
+        "branch": "chapter1.2.lts.test",
+        "note": "LTS test"
+      },
+      {
+        "date": "2024-11-25",
+        "manifest": "2628312138164230554",
+        "branch": "chapter1.2.lts.test",
+        "note": "LTS test"
+      },
+      {
+        "date": "2022-06-06",
+        "manifest": "2367536887136698437",
+        "branch": "chapter1.2.112.windows7fix",
+        "note": "Windows 7 fix"
+      },
+      {
+        "date": "2022-04-14",
+        "manifest": "5074858852605134904",
+        "branch": "chapter1.2.112.windows7fix",
+        "note": "Windows 7 fix"
+      },
+      {
+        "date": "2022-04-12",
+        "manifest": "7551597989642163660",
+        "branch": "chapter1.2.112.windows7fix",
+        "note": "Windows 7 fix"
+      },
+      {
+        "date": "2022-04-11",
+        "manifest": "6907182482516437783",
+        "branch": "chapter1.2.112.windows7fix",
+        "note": "Windows 7 fix"
+      },
+      { "date": "2022-02-25", "manifest": "7280478300334929399" },
+      { "date": "2022-02-24", "manifest": "3831195597201285088" },
+      { "date": "2022-02-22", "manifest": "3928884402338717316" },
+      { "date": "2021-09-30", "manifest": "8311763012442684526" },
+      { "date": "2021-09-23", "manifest": "2438050533604741459" },
+      { "date": "2021-09-21", "manifest": "8068723090824935880" },
+      { "date": "2021-09-19", "manifest": "5665575182022562169" },
+      {
+        "id": "2021-09-18-0405",
+        "date": "2021-09-18",
+        "manifest": "6399680291216263180",
+        "note": "04:05 UTC"
+      },
+      {
+        "id": "2021-09-18-0126",
+        "date": "2021-09-18",
+        "manifest": "3058538026860111700",
+        "note": "01:26 UTC"
+      },
+      { "date": "2021-09-17", "manifest": "1237260587432546177" }
+    ]
+  },
+  "survey-program": {
+    "label": "SURVEY_PROGRAM",
+    "directory": "survey_program",
+    "singleChapter": "survey_program",
+    "releases": [{ "date": "2018-10-31" }]
+  }
+}

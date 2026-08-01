@@ -1,0 +1,83 @@
+input[type="text"],
+input[type="search"] {
+  font-family: var(--font-sans);
+}
+
+#search-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+#search-form .search-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  padding-bottom: 0;
+}
+
+#search-form .search-menu label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+#search-form .search-menu :is(input[type="text"], input[type="search"]) {
+  min-width: min(22rem, 100%);
+}
+
+#search-form fieldset {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.search-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.search-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  line-height: 1;
+  transition: color 0.15s ease;
+  user-select: none;
+}
+
+.search-option:hover {
+  color: var(--text-1);
+}
+
+#search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#search-results.hidden {
+  display: none;
+}
+
+#search-status {
+  color: var(--text-2);
+}
+
+#script-sections tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 36px;
+}
+
+#script-sections {
+  display: contents;
+}

@@ -1,2 +1,34 @@
-/raw/*
-  X-Robots-Tag: noindex
+# Content-addressed or otherwise fingerprinted: the URL changes when the bytes
+# do, so these can never go stale.
+
+/static/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Per-chapter search indexes are tagged with their content revision.
+/:chapter/index-:revision.json.gz
+  Cache-Control: public, max-age=31536000, immutable
+
+# Mutable indexes and pointer files may change at the same URL.
+/data/catalog.json
+  Cache-Control: public, no-cache
+
+/data/aliases.json.gz
+  Cache-Control: public, no-cache
+
+/static/fonts/*
+  Cache-Control: public, no-cache
+
+/data/pages/payloads/*
+  Cache-Control: public, no-cache
+
+/data/sources/*
+  Cache-Control: public, no-cache
+
+/data/pages/builds/*
+  Cache-Control: public, no-cache
+
+/data/pages/:chapter.json.gz
+  Cache-Control: public, no-cache
+
+/:chapter/index.json.gz
+  Cache-Control: public, no-cache

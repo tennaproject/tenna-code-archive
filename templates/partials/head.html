@@ -1,6 +1,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="/static/highlight/github-dark.min.css" />
-<link rel="stylesheet" href="/static/fonts.css" />
-<link rel="stylesheet" href="/static/main.css" />
+<meta name="theme-color" content="#1f1e2a">
+<meta name="shard-prefix-length" content="{{ shard_prefix_length }}">
+<link rel="icon" href="/static/logo.svg" type="image/svg+xml">
+<link rel="preload" href="/static/fonts/pixel-operator/PixelOperator.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/pixel-operator/PixelOperator-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ assets['fonts.css'] }}" />
+<link rel="stylesheet" href="{{ assets['main.css'] }}" />
+<script type="speculationrules">
+{
+  "prerender": [
+    {
+      "where": {
+        "or": [
+          { "href_matches": "/gml_*.html" },
+          { "href_matches": "/*/gml_*.html" }
+        ]
+      },
+      "eagerness": "moderate"
+    }
+  ]
+}
+</script>

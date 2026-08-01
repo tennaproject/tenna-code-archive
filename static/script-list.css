@@ -1,0 +1,157 @@
+#comparison-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+#script-sections > table,
+#search-results table,
+#comparison-sections > table,
+.inventory-table {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-collapse: collapse;
+  background: var(--surface-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+}
+
+#comparison-sections > table,
+.chapter-inventory,
+#search-results table {
+  table-layout: fixed;
+}
+
+.chapter-inventory :is(th, td):not(:first-child) {
+  width: 5rem;
+}
+
+.chapter-inventory .table-subsection-content > :first-child,
+#search-results .table-subsection-content > :last-child {
+  overflow-wrap: anywhere;
+}
+
+#search-results :is(th, td):first-child {
+  width: 4rem;
+}
+
+#comparison-sections > table col.inventory-col-status {
+  width: 6rem;
+}
+
+#comparison-sections > table col.inventory-col-lines {
+  width: 7rem;
+}
+
+#script-sections > table th,
+#script-sections > table td,
+#search-results table th,
+#search-results table td,
+#comparison-sections > table th,
+#comparison-sections > table td,
+.inventory-table th,
+.inventory-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--divider-color);
+  text-align: start;
+}
+
+#script-sections > table th,
+#search-results table th,
+#comparison-sections > table th,
+.inventory-table th {
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.table-subsection-header > :is(th, td) {
+  background: color-mix(in oklch, var(--surface-3) 65%, transparent);
+  color: var(--text-2);
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+.table-subsection-content {
+  transition: background-color 0.15s ease;
+}
+
+.table-subsection-content:hover > * {
+  background: var(--surface-2-hover);
+}
+
+#script-sections .table-subsection-content > :first-child,
+#search-results .table-subsection-content > :first-child {
+  padding-inline-start: 1rem;
+}
+
+#comparison-sections .table-subsection-content td:nth-child(2) {
+  padding-inline-start: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.script-list-sentinel {
+  padding: 1rem;
+  color: var(--text-3);
+  text-align: center;
+  font-size: var(--text-base);
+}
+
+.inventory-table .table-subsection-content a,
+#search-results .table-subsection-content a,
+#comparison-sections .table-subsection-content a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.inventory-table .table-subsection-content a.raw-link {
+  color: var(--link-color);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.inventory-table .table-subsection-content a.raw-link:hover {
+  color: var(--link-hover-color);
+}
+
+#comparison-sections .table-subsection-content a {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  line-height: inherit;
+  overflow-wrap: anywhere;
+  text-align: start;
+}
+
+.inventory-table .table-subsection-content a:hover .suffix,
+#search-results .table-subsection-content a:hover .suffix,
+#comparison-sections .table-subsection-content a:hover .suffix {
+  color: var(--link-hover);
+}
+
+#comparison-sections .table-subsection-content a:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media screen and (max-width: 720px) {
+  #comparison-sections > table col.inventory-col-status {
+    width: 5rem;
+  }
+
+  #comparison-sections > table col.inventory-col-lines {
+    width: 3.5rem;
+  }
+
+  #comparison-sections > table th,
+  #comparison-sections > table td {
+    padding-inline: 0.5rem;
+  }
+
+  #comparison-sections .table-subsection-content td:nth-child(2) {
+    padding-inline-start: 0.5rem;
+  }
+}

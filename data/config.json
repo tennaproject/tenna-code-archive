@@ -1,0 +1,33 @@
+{
+    "game": "DELTARUNE",
+    "shardPrefixLength": 3,
+    "chapters": {
+      "init": "Chapter Select",
+      "ch1": "Chapter 1",
+      "ch2": "Chapter 2",
+      "ch3": "Chapter 3",
+      "ch4": "Chapter 4",
+      "ch5": "Chapter 5",
+      "demo": "Demo",
+      "survey_program": "SURVEY_PROGRAM"
+    },
+    "timelineRelationships": [
+      {
+        "kind": "shared-source",
+        "sourceChapter": "survey_program",
+        "targetChapters": ["demo"],
+        "label": "SURVEY_PROGRAM is the source for the later combined Chapters 1 & 2 demo."
+      },
+      {
+        "kind": "shared-source",
+        "sourceChapter": "demo",
+        "targetChapters": ["ch1", "ch2"],
+        "label": "The combined Chapters 1 & 2 demo is the shared source for the later separate chapter releases."
+      }
+    ],
+    "links": {
+      "Source code": "https://github.com/tennaproject/tenna-gml-viewer",
+      "License": "https://github.com/tennaproject/tenna-gml-viewer/blob/master/LICENSE"
+    },
+    "footer": "Fan project, not affiliated with or endorsed by Toby Fox. DELTARUNE™ is a trademark of Royal Sciences, LLC."
+}

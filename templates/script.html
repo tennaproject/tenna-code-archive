@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-chaptered="{% if chaptered %}true{% else %}false{% endif %}" data-highlight-worker="{{ assets['script-highlighter.js'] }}">
+    <head>
+        <title>Script - Tenna Code Archive</title>
+        {% include 'partials/head.html' %}
+        <link rel="stylesheet" href="{{ assets['github-dark.min.css'] }}" />
+        <link rel="stylesheet" href="{{ assets['annotations.css'] }}" />
+        <link rel="stylesheet" href="{{ assets['script.css'] }}" />
+        <link rel="preload" href="/data/catalog.json" as="fetch" crossorigin />
+        <script type="module" src="{{ assets['script.js'] }}"></script>
+    </head>
+    <body>
+        {% include 'partials/brand.html' %}
+        <main id="main" tabindex="-1" class="script-main">
+            <div class="page-heading script-heading">
+                <nav class="page-heading-nav" aria-label="Page">
+                    <a id="back-to-chapter" class="ui-button ui-button-ghost ui-icon-back" href="index.html">Back to chapter</a>
+                </nav>
+                <div class="page-heading-copy">
+                    <h1 id="script-name">Loading script…</h1>
+                </div>
+                <div class="page-heading-actions">
+                    <label class="release-picker">Release <select id="script-release" disabled></select></label>
+                    <a id="raw-source" class="ui-button ui-button-ghost ui-icon-code pending-reveal">View raw source</a>
+                </div>
+            </div>
+
+            <nav id="script-disambig" class="script-disambig" aria-label="Chapter selection" hidden>
+                <p class="disambig-copy">This script exists in multiple chapters:</p>
+                <ul class="disambig-list"></ul>
+            </nav>
+            <nav id="related-scripts" class="panel-muted related-scripts" aria-label="Related scripts" hidden>
+                <strong class="section-label">Related scripts:</strong>
+                <span id="related-script-links"></span>
+            </nav>
+
+            <div id="code-panel" class="code-panel">
+                <p id="script-status" class="code-status" role="status" aria-live="polite">Loading annotated source…</p>
+                <table class="code" aria-labelledby="script-name"></table>
+            </div>
+        </main>
+
+    </body>
+</html>

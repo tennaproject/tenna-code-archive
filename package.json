@@ -1,0 +1,40 @@
+{
+  "name": "tenna-code-archive",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.4.0",
+  "scripts": {
+    "build": "bun run src/commands/build.ts",
+    "check": "bun run lint && bun run format:check && bun run typecheck",
+    "dev": "wrangler pages dev out/deltarune",
+    "format": "bun run prettier --write src",
+    "format:check": "bun run prettier --check src",
+    "depot:archive": "bun run src/commands/archive-depot.ts",
+    "depot:download": "bun run src/commands/import-depot.ts",
+    "depot:extract": "bun run src/commands/extract-depot.ts",
+    "depot:restore": "bun run src/commands/restore-depot.ts",
+    "gml:prepare": "bun run src/commands/prepare-gml.ts",
+    "release:candidate": "bun run src/commands/add-release-candidate.ts",
+    "deploy:provenance": "bun run src/commands/write-build-provenance.ts",
+    "deploy:smoke": "bun run src/commands/smoke-deployment.ts",
+    "lint": "bun run eslint src",
+    "typecheck": "bun run tsc --noEmit"
+  },
+  "dependencies": {
+    "@highlightjs/cdn-assets": "11.11.1",
+    "nunjucks": "3.2.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/bun": "1.3.14",
+    "@types/nunjucks": "3.2.6",
+    "eslint": "10.7.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.7.0",
+    "prettier": "3.9.5",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "8.63.0",
+    "wrangler": "^4.114.0"
+  }
+}

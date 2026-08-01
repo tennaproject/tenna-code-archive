@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-diff-worker="{{ assets['diff-worker.js'] }}">
+    <head>
+        <title>Compare releases - Tenna Code Archive</title>
+        {% include 'partials/head.html' %}
+        <link rel="stylesheet" href="{{ assets['github-dark.min.css'] }}" />
+        <link rel="stylesheet" href="{{ assets['script-list.css'] }}" />
+        <link rel="stylesheet" href="{{ assets['annotations.css'] }}" />
+        <link rel="stylesheet" href="{{ assets['compare.css'] }}" />
+        <link rel="modulepreload" href="{{ assets['compare.js'] }}" />
+        <link rel="preload" href="/data/catalog.json" as="fetch" crossorigin />
+        <script type="module" src="{{ assets['compare.js'] }}"></script>
+    </head>
+    <body>
+        {% include 'partials/brand.html' %}
+        <main id="main" tabindex="-1" class="browse-main">
+            <header class="browse-header">
+                <nav class="page-heading-nav" aria-label="Page">
+                    <a class="ui-button ui-button-ghost ui-icon-back" href="/">Timeline</a>
+                </nav>
+                <div class="browse-header-copy">
+                    <h1>Compare releases</h1>
+                </div>
+            </header>
+
+            <p class="page-description">Compare script inventories and inspect exact line changes.</p>
+            <div class="browse-controls" role="group" aria-label="Comparison scope">
+                <label>Chapter <select id="chapter" disabled></select></label>
+                <label>Earlier release <select id="left-build" disabled></select></label>
+                <label>Later release <select id="right-build" disabled></select></label>
+            </div>
+            <section id="script-list-section" class="browse-section">
+                <div class="section-heading">
+                    <h2>Script inventory</h2>
+                    <p id="comparison-summary" role="status" aria-live="polite">Loading catalog…</p>
+                </div>
+                <div class="script-list-tools">
+                    <fieldset class="filter-control" id="script-filter-kind">
+                        <legend>Show</legend>
+                        <div class="filter-options">
+                            <label class="filter-option" for="filter-changed">
+                                <input type="checkbox" id="filter-changed" value="changed" aria-describedby="filter-changed-hint" checked>
+                                <span>Changed</span>
+                            </label>
+                            <label class="filter-option" for="filter-added">
+                                <input type="checkbox" id="filter-added" value="added" aria-describedby="filter-added-hint" checked>
+                                <span>Added</span>
+                            </label>
+                            <label class="filter-option" for="filter-removed">
+                                <input type="checkbox" id="filter-removed" value="removed" aria-describedby="filter-removed-hint" checked>
+                                <span>Deleted</span>
+                            </label>
+                            <label class="filter-option" for="filter-renumbered">
+                                <input type="checkbox" id="filter-renumbered" value="renumbered" aria-describedby="filter-renumbered-hint">
+                                <span>Renumbered</span>
+                            </label>
+                            <label class="filter-option" for="filter-unchanged">
+                                <input type="checkbox" id="filter-unchanged" value="unchanged" aria-describedby="filter-unchanged-hint">
+                                <span>Unchanged</span>
+                            </label>
+                        </div>
+                        <div class="option-hints">
+                            <span class="option-hint" id="filter-changed-hint">In both releases, source differs.</span>
+                            <span class="option-hint" id="filter-added-hint">Only in the later release.</span>
+                            <span class="option-hint" id="filter-removed-hint">Only in the earlier release.</span>
+                            <span class="option-hint" id="filter-renumbered-hint">Source differs only by asset indices moving when the game was rebuilt.</span>
+                            <span class="option-hint" id="filter-unchanged-hint">In both releases, source identical.</span>
+                        </div>
+                    </fieldset>
+                    <label class="sort-control">Sort by
+                        <select id="script-sort">
+                            <option value="group">Object / group</option>
+                            <option value="changes">Changes first</option>
+                            <option value="line-change">Largest line change</option>
+                            <option value="earlier-lines">Earlier line count</option>
+                            <option value="later-lines">Later line count</option>
+                        </select>
+                    </label>
+                    <button type="button" id="copy-script-list" class="ui-button ui-button-ghost ui-icon-copy" disabled>Copy list</button>
+                </div>
+                <div id="comparison-sections" aria-busy="true">
+                    <p class="comparison-loading">Loading script inventory…</p>
+                </div>
+            </section>
+
+            <section id="diff-section" class="source-section" hidden>
+                <div class="section-heading">
+                    <nav class="page-heading-nav" aria-label="Page">
+                        <a id="back-to-scripts" class="ui-button ui-button-ghost ui-icon-back" href="/compare.html">Back to scripts</a>
+                    </nav>
+                    <h2 id="diff-title">Select a script</h2>
+                    <nav id="diff-navigation" class="diff-navigation" aria-label="Diff changes" hidden>
+                        <span id="diff-navigation-position">No changes</span>
+                        <button type="button" id="previous-diff-change" class="ui-button ui-button-ghost diff-navigation-button" aria-label="Previous change" title="Previous change" disabled>↑</button>
+                        <button type="button" id="next-diff-change" class="ui-button ui-button-ghost diff-navigation-button" aria-label="Next change" title="Next change" disabled>↓</button>
+                    </nav>
+                </div>
+                <div class="source-container">
+                    <table class="diff-table" aria-labelledby="diff-title">
+                        <colgroup><col class="line-number" /><col /><col class="line-number" /><col /></colgroup>
+                        <thead><tr><th scope="col">Line</th><th scope="col">Earlier release</th><th scope="col">Line</th><th scope="col">Later release</th></tr></thead>
+                        <tbody id="diff-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>

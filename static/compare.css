@@ -1,0 +1,346 @@
+.browse-main {
+  gap: 1rem;
+}
+
+.browse-header {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 3.25rem;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--divider-color);
+  padding: 0.5rem 0;
+}
+
+.browse-header-copy {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+#comparison-summary {
+  color: var(--text-2);
+}
+
+.browse-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  background: color-mix(in oklch, var(--surface-3) 50%, transparent);
+}
+
+.browse-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.browse-controls select {
+  min-width: 13rem;
+}
+
+.section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-heading h2 {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+#diff-section > .section-heading {
+  position: sticky;
+  top: var(--site-header-height);
+  z-index: 4;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--divider-color);
+  background: var(--surface-2);
+  padding-block: 0.5rem;
+}
+
+#diff-section > .section-heading > #diff-title {
+  flex: 1 1 auto;
+}
+
+.browse-section,
+.source-section {
+  min-width: 0;
+}
+
+#diff-section > .source-container {
+  min-width: 0;
+}
+
+.source-container {
+  max-width: 100%;
+}
+
+#diff-section .source-container {
+  max-height: none;
+  overflow: visible;
+}
+
+.diff-warning {
+  margin: 0 0 0.75rem;
+}
+
+.diff-navigation {
+  display: flex;
+  width: max-content;
+  min-height: 2.5rem;
+  align-items: center;
+  margin-block: 0;
+  margin-inline-start: auto;
+  border: 1px solid var(--border-color);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#diff-navigation-position {
+  min-width: 7.5rem;
+  padding-inline: 0.75rem;
+  text-align: center;
+}
+
+.diff-navigation-button {
+  width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  border-block: 0;
+  border-inline-end: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+}
+
+.script-list-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  background: color-mix(in oklch, var(--surface-3) 50%, transparent);
+}
+
+.script-list-tools .ui-button {
+  min-height: 2.5rem;
+}
+
+.sort-control {
+  display: flex;
+  min-width: 13rem;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--text-2);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.filter-control {
+  padding: 0.35rem 0.85rem 0.6rem;
+  background: transparent;
+}
+
+.filter-control legend {
+  padding: 0 0.4rem;
+}
+
+.filter-options {
+  display: flex;
+  min-height: 1.7rem;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+}
+
+.filter-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  line-height: 1;
+  transition: color 0.15s ease;
+  user-select: none;
+}
+
+.filter-option:hover {
+  color: var(--text-1);
+}
+
+.comparison-loading,
+.comparison-empty,
+.diff-error,
+.script-list-sentinel {
+  padding: 1rem;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.comparison-loading {
+  min-height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#comparison-sections tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 36px;
+}
+
+.comparison-added td:first-child {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.comparison-removed td:first-child {
+  background: var(--red-soft);
+  color: var(--link);
+}
+
+.comparison-changed td:first-child {
+  background: var(--yellow-soft);
+  color: var(--yellow);
+}
+
+.comparison-renumbered td:first-child {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+
+.comparison-unchanged {
+  color: var(--text-3);
+}
+
+#comparison-sections .line-delta {
+  font-variant-numeric: tabular-nums;
+}
+
+#comparison-sections .line-delta-positive {
+  color: var(--green);
+}
+
+#comparison-sections .line-delta-negative {
+  color: var(--link);
+}
+
+#comparison-sections .line-delta-neutral {
+  color: var(--text-3);
+}
+
+.diff-table {
+  table-layout: fixed;
+}
+
+.diff-table .line-number {
+  width: 4rem;
+}
+
+.diff-table th,
+.diff-table td {
+  padding: 0.38rem 0.65rem;
+  border-bottom: 1px solid var(--divider-color);
+  vertical-align: top;
+}
+
+.diff-table th {
+  font-weight: 400;
+}
+
+.diff-table thead {
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.diff-table thead th {
+  color: var(--text-2);
+  text-align: start;
+}
+
+.diff-table td {
+  width: calc(50% - 4rem);
+  padding: 0.38rem 0.5rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.diff-table td code {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.diff-table tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 36px;
+}
+
+.diff-delete > :nth-child(-n + 2),
+.diff-change > :nth-child(-n + 2) {
+  background: var(--red-soft);
+}
+
+.diff-insert > :nth-child(n + 3),
+.diff-change > :nth-child(n + 3) {
+  background: var(--green-soft);
+}
+
+.diff-renumbering > :nth-child(-n + 2),
+.diff-renumbering > :nth-child(n + 3) {
+  background: none;
+}
+
+.diff-hunk-current > :first-child {
+  box-shadow: inset 3px 0 var(--focus);
+}
+
+@media screen and (max-width: 720px) {
+  .browse-controls {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .script-list-tools {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .browse-controls label,
+  .browse-controls select,
+  .sort-control,
+  .sort-control select,
+  .filter-control,
+  .script-list-tools .ui-button {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}

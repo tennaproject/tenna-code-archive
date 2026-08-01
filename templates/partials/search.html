@@ -1,34 +1,43 @@
 <form method="GET" id="search-form">
     <p class="search-menu">
-        <label for="search">search:</label>
-        <input type="text" name="search" id="search" size="20">
-        <input type="submit" value="go">
-        <input type="hidden" name="cache-version" value="{{ cache_version }}">
+        <label for="search">Search
+            <input type="search" name="search" id="search" size="20" required>
+        </label>
+        <button type="submit" id="search-submit" class="ui-button ui-button-primary ui-icon-search" disabled>Search</button>
     </p>
 
     <fieldset>
         <legend>Search options</legend>
-        <p>
-            <label for="case-sensitive" title="If you check this box, your search will return only lines where the case of your search term matches as well.">Case sensitive:</label>
-            <input type="checkbox" name="case-sensitive" id="case-sensitive">
-        </p>
-        <p>
-            <label for="is-regex" title="If you check this box, your search term will be interpreted as a regular expression.">Regex:</label>
-            <input type="checkbox" name="is-regex" id="is-regex">
-        </p>
-        <p>
-            <label for="find-all" title="By default, search finds the first 20 matches. If you check this box, it will find all matches of the thing you're searching for (can take a while).">Find all:</label>
-            <input type="checkbox" name="find-all" id="find-all">
-        </p>
+        <div class="search-options">
+            <label class="search-option" for="case-sensitive">
+                <input type="checkbox" name="case-sensitive" id="case-sensitive" aria-describedby="case-sensitive-hint">
+                <span>Case sensitive</span>
+            </label>
+            <label class="search-option" for="is-regex">
+                <input type="checkbox" name="is-regex" id="is-regex" aria-describedby="is-regex-hint">
+                <span>Regex</span>
+            </label>
+            <label class="search-option" for="find-all">
+                <input type="checkbox" name="find-all" id="find-all" aria-describedby="find-all-hint">
+                <span>Find all</span>
+            </label>
+        </div>
+        <div class="option-hints">
+            <span class="option-hint" id="case-sensitive-hint">Matches your term exactly.</span>
+            <span class="option-hint" id="is-regex-hint">Reads your term as a regular expression.</span>
+            <span class="option-hint" id="find-all-hint">Returns every match instead of the first 100, and takes longer.</span>
+        </div>
     </fieldset>
 </form>
 <section class="hidden" id="search-results">
-    <h2>search results</h2>
-    <p id="search-status"></p>
+    <h2 class="section-label">Search results</h2>
+    <p id="search-status" role="status" aria-live="polite"></p>
     <table>
         <thead>
-            <th>Num</th>
-            <th>Line</th>
+            <tr>
+                <th scope="col">Line</th>
+                <th scope="col">Source</th>
+            </tr>
         </thead>
         <tbody id="search-hits"></tbody>
     </table>
