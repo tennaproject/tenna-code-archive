@@ -62,6 +62,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary
       - name: Download exact Worker artifact
         uses: actions/download-artifact@v8
         with:
