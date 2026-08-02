@@ -1,9 +1,9 @@
 ![Tenna Code Archive - Site for viewing and comparing DELTARUNE™ game script from all releases](/static/banner.svg)
 
-[!IMPORTANT]
-This project is a **hard** fork of [`utdrwiki/code-viewer`](https://github.com/utdrwiki/code-viewer). 
-Original [MIT license](https://github.com/utdrwiki/code-viewer/blob/master/LICENSE) terms apply.
-Huge thanks to original project contributors for their work!
+> [!IMPORTANT]
+> This project is a **hard** fork of [`utdrwiki/code-viewer`](https://github.com/utdrwiki/code-viewer). 
+> Original [MIT license](https://github.com/utdrwiki/code-viewer/blob/master/LICENSE) terms apply.
+> Huge thanks to original project contributors for their work!
 
 Aim of this project is providing an easy way to view and compare game script from different releases of DELTARUNE™.
 At current state, it vast majority of historical releases are included. 
