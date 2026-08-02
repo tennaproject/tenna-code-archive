@@ -61,6 +61,7 @@ jobs:
     permissions:
       contents: read
     steps:
+      - uses: actions/checkout@v7
       - name: Download exact Worker artifact
         uses: actions/download-artifact@v8
         with:
@@ -71,4 +72,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --name=tenna-code-archive --compatibility-date=2026-07-29 --message="GitHub ${{ github.sha }}"
+          command: deploy --message="GitHub ${{ github.sha }}"
