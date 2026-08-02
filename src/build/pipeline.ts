@@ -133,6 +133,7 @@ export async function buildDeltarune(options: BuildOptions = {}): Promise<BuildR
               ),
             ),
           ],
+          config.chapters,
           plan.outputDirectory,
         ),
       ]);

@@ -12,6 +12,7 @@ export interface Room {
 
 export interface Config {
   game: string;
+  siteUrl?: string;
   links: Record<string, string>;
   chapters: Record<string, string>;
   timelineRelationships?: TimelineRelationship[];

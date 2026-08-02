@@ -1,5 +1,6 @@
 {
     "game": "DELTARUNE",
+    "siteUrl": "https://code.tennaproject.com",
     "shardPrefixLength": 3,
     "chapters": {
       "init": "Chapter Select",

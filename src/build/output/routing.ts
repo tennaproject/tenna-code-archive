@@ -9,6 +9,16 @@ interface ScriptAlias {
   chapters: string[];
 }
 
+interface EmbedScript {
+  canonical: string;
+  chapters: Array<{ id: string; label: string }>;
+}
+
+interface EmbedMap {
+  schemaVersion: 1;
+  scripts: Record<string, EmbedScript>;
+}
+
 function buildAliasMap(chapters: RenderedChapter[]): Record<string, ScriptAlias> {
   const aggregate = new Map<string, string[]>();
   for (const chapter of chapters) {
@@ -45,17 +55,34 @@ function buildAliasMap(chapters: RenderedChapter[]): Record<string, ScriptAlias>
   return scripts;
 }
 
+function buildEmbedMap(
+  aliases: Record<string, ScriptAlias>,
+  chapterLabels: Readonly<Record<string, string>>,
+): EmbedMap {
+  const scripts: Record<string, EmbedScript> = {};
+  for (const [name, alias] of Object.entries(aliases)) {
+    scripts[name] = {
+      canonical: alias.canonical,
+      chapters: alias.chapters.map((id) => ({ id, label: chapterLabels[id] ?? id })),
+    };
+  }
+  return { schemaVersion: 1, scripts };
+}
+
 export async function writeRouting(
   chapters: RenderedChapter[],
   routableChapterIds: string[],
+  chapterLabels: Readonly<Record<string, string>>,
   outputDirectory: string,
 ): Promise<void> {
   const dataDirectory = join(outputDirectory, "data");
   await mkdir(dataDirectory, { recursive: true });
+  const aliases = buildAliasMap(chapters);
   await writeGzipJson(join(dataDirectory, "aliases.json.gz"), {
     schemaVersion: 2,
-    scripts: buildAliasMap(chapters),
+    scripts: aliases,
   });
+  await writeGzipJson(join(dataDirectory, "embeds.json.gz"), buildEmbedMap(aliases, chapterLabels));
 
   const rewrites = routableChapterIds.map((chapterId) => `/${chapterId}/gml_* /script 200`);
   await writeFile(

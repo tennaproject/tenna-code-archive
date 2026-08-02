@@ -1,0 +1,8 @@
+name = "tenna-code-archive"
+main = "src/worker.ts"
+compatibility_date = "2026-07-29"
+
+[assets]
+directory = "out/deltarune"
+binding = "ASSETS"
+run_worker_first = true

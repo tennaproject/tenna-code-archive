@@ -5,10 +5,8 @@
     "moduleResolution": "bundler",
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "types": ["bun"],
+    "types": ["@cloudflare/workers-types"],
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "tests/**/*.ts"],
-  "exclude": ["src/worker.ts"]
+  "include": ["src/worker.ts"]
 }

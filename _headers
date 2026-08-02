@@ -15,6 +15,9 @@
 /data/aliases.json.gz
   Cache-Control: public, no-cache
 
+/data/embeds.json.gz
+  Cache-Control: public, no-cache
+
 /static/fonts/*
   Cache-Control: public, no-cache
 

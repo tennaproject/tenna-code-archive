@@ -11,6 +11,7 @@ const required = [
   ".build-stamp",
   "data/catalog.json",
   "data/aliases.json.gz",
+  "data/embeds.json.gz",
   "data/build-provenance.json",
 ];
 for (const file of required) {

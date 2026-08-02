@@ -65,10 +65,10 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: deltarune-worker-${{ github.sha }}
-          path: site
+          path: out/deltarune
       - name: Deploy artifact to tenna-code-archive Worker
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --assets=site --name=tenna-code-archive --compatibility-date=2026-07-29 --message="GitHub ${{ github.sha }}"
+          command: deploy --name=tenna-code-archive --compatibility-date=2026-07-29 --message="GitHub ${{ github.sha }}"
