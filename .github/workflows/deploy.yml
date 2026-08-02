@@ -45,10 +45,10 @@ jobs:
         run: bun run deploy:provenance out/deltarune
       - name: Smoke test deployment artifact
         run: bun run deploy:smoke out/deltarune
-      - name: Upload exact Pages artifact
+      - name: Upload exact Worker artifact
         uses: actions/upload-artifact@v7
         with:
-          name: deltarune-pages-${{ github.sha }}
+          name: deltarune-worker-${{ github.sha }}
           path: out/deltarune
           include-hidden-files: true
           if-no-files-found: error
@@ -61,14 +61,14 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Download exact Pages artifact
+      - name: Download exact Worker artifact
         uses: actions/download-artifact@v8
         with:
-          name: deltarune-pages-${{ github.sha }}
+          name: deltarune-worker-${{ github.sha }}
           path: site
-      - name: Deploy artifact to Cloudflare Pages
+      - name: Deploy artifact to tenna-code-archive Worker
         uses: cloudflare/wrangler-action@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT }} --branch=master
+          command: deploy --assets=site --name=tenna-code-archive --message="GitHub ${{ github.sha }}"
