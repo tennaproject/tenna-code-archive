@@ -7,7 +7,7 @@
   "scripts": {
     "build": "bun run src/commands/build.ts",
     "check": "bun run lint && bun run format:check && bun run typecheck",
-    "dev": "wrangler pages dev out/deltarune",
+    "dev": "wrangler pages dev out/deltarune --compatibility-date=2026-07-29",
     "format": "bun run prettier --write src",
     "format:check": "bun run prettier --check src",
     "depot:archive": "bun run src/commands/archive-depot.ts",
