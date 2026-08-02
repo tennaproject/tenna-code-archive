@@ -71,4 +71,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_WORKERS_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --assets=site --name=tenna-code-archive --message="GitHub ${{ github.sha }}"
+          command: deploy --assets=site --name=tenna-code-archive --compatibility-date=2026-08-02 --message="GitHub ${{ github.sha }}"
