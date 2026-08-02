@@ -59,7 +59,7 @@ code,
   outline-offset: 2px;
 }
 
-.localized-text > span {
+.localized-text > .skip-highlight {
   display: inline-block;
   vertical-align: top;
 }
