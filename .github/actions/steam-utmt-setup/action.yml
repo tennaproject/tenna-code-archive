@@ -1,9 +1,25 @@
-name: 'Steam UTMT Setup'
-description: 'Install steamcmd and UndertaleModCLI'
+name: "Pinned UTMT Setup"
+description: "Build a required UndertaleModTool revision and install viewer dependencies"
+inputs:
+  utmt-ref:
+    required: true
+  install-steam:
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
+    - name: Validate UTMT revision
+      shell: bash
+      env:
+        UTMT_REF: ${{ inputs.utmt-ref }}
+      run: |
+        if [[ ! "$UTMT_REF" =~ ^[0-9a-f]{40}$ ]]; then
+          echo "utmt-ref must be an exact 40-character commit" >&2
+          exit 1
+        fi
     - name: Download steamcmd
+      if: inputs.install-steam == 'true'
       shell: sh
       run: |
         sudo add-apt-repository multiverse
@@ -13,15 +29,21 @@ runs:
         echo steam steam/license note '' | sudo debconf-set-selections
         sudo apt install -y steamcmd
     - name: Checkout UTMT
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: UnderminersTeam/UndertaleModTool
         path: utmt
+        ref: ${{ inputs.utmt-ref }}
         submodules: recursive
     - name: Setup .NET
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
+    - name: Verify UTMT revision
+      shell: bash
+      env:
+        UTMT_REF: ${{ inputs.utmt-ref }}
+      run: test "$(git -C utmt rev-parse HEAD)" = "$UTMT_REF"
     - name: Restore UTMT dependencies
       shell: sh
       run: dotnet restore utmt/UndertaleModCli
@@ -31,10 +53,13 @@ runs:
     - name: Publish UTMT CLI
       shell: sh
       run: dotnet publish utmt/UndertaleModCli -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=false --output utmtcli
-    - name: Setup Python
-      uses: actions/setup-python@v6
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
       with:
-        python-version: '3.12'
-    - name: Install Python dependencies
+        bun-version: canary
+    - name: Install viewer dependencies
       shell: sh
-      run: pip install -r requirements.txt
+      run: bun install --frozen-lockfile
+    - name: Install zstd
+      shell: sh
+      run: sudo apt-get update && sudo apt-get install -y zstd
