@@ -1,0 +1,74 @@
+name: Deploy
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.0
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+
+  build:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Read pinned toolchain
+        id: toolchain
+        shell: bash
+        run: echo "utmt_ref=$(jq -r .utmtCommit data/toolchain.json)" >> "$GITHUB_OUTPUT"
+      - name: Build pinned UTMT
+        uses: ./.github/actions/steam-utmt-setup
+        with:
+          utmt-ref: ${{ steps.toolchain.outputs.utmt_ref }}
+      - name: Prepare full historical GML
+        run: bun run gml:prepare --archive-bucket tenna-archive --cache-bucket tenna-cache
+        env:
+          TENNA_R2_ENDPOINT: ${{ secrets.TENNA_R2_ENDPOINT }}
+          TENNA_ARCHIVE_ACCESS_KEY_ID: ${{ secrets.TENNA_ARCHIVE_ACCESS_KEY_ID }}
+          TENNA_ARCHIVE_SECRET_ACCESS_KEY: ${{ secrets.TENNA_ARCHIVE_SECRET_ACCESS_KEY }}
+          TENNA_CACHE_ACCESS_KEY_ID: ${{ secrets.TENNA_CACHE_ACCESS_KEY_ID }}
+          TENNA_CACHE_SECRET_ACCESS_KEY: ${{ secrets.TENNA_CACHE_SECRET_ACCESS_KEY }}
+          TENNA_UTMT_CLI: ${{ github.workspace }}/utmtcli/UndertaleModCli
+      - name: Build full history
+        run: bun run build --gml local/decompiled --prune
+      - name: Write public provenance
+        run: bun run deploy:provenance out/deltarune
+      - name: Smoke test deployment artifact
+        run: bun run deploy:smoke out/deltarune
+      - name: Upload exact Pages artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: deltarune-pages-${{ github.sha }}
+          path: out/deltarune
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Download exact Pages artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: deltarune-pages-${{ github.sha }}
+          path: site
+      - name: Deploy artifact to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site --project-name=${{ secrets.CLOUDFLARE_PAGES_PROJECT }} --branch=master
