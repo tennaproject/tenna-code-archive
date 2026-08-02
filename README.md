@@ -1,35 +1,91 @@
-# GameMaker code viewer
+![Tenna Code Archive - Site for viewing and comparing DELTARUNE™ game script from all releases](/static/banner.svg)
 
-A rewrite of xkeeper's [deltarune-viewer](https://mini.xkeeper.net/private/deltarune/), from PHP into Python, made into a static website. Hosted on [Netlify](https://www.netlify.com/), and made for the purpose of referencing code from the following wikis:
+[!IMPORTANT]
+This project is a **hard** fork of [`utdrwiki/code-viewer`](https://github.com/utdrwiki/code-viewer). 
+Original [MIT license](https://github.com/utdrwiki/code-viewer/blob/master/LICENSE) terms apply.
+Huge thanks to original project contributors for their work!
 
-- [Undertale Wiki](https://undertale.wiki/) ([viewer](https://code.undertale.wiki/))
-- [Deltarune Wiki](https://deltarune.wiki/) ([viewer](https://code.deltarune.wiki/))
-- [Undertale Yellow Wiki](https://undertaleyellow.wiki.gg/) ([viewer](https://code.yellow.undertale.wiki/))
+Aim of this project is providing an easy way to view and compare game script from different releases of DELTARUNE™.
+At current state, it vast majority of historical releases are included. 
+New releases are added as they become available.
 
-While this may not be suited for personal use, contributions that make it easier to run locally (especially on Windows) are appreciated. For personal use, you can also see [this repo](https://github.com/Jacky720/deltarune-viewer).
+Official instance is available at [https://code.tennaproject.com](https://code.tennaproject.com).
 
-## Prerequisites
+## Features
 
-- Bash (for running build scripts; [Git Bash](https://git-scm.com/) on Windows can work)
-- [Python](https://python.org/) for generating the website
+Tenna Code Archive works completely in browser. 
+Parts of source code are downloaded and decompressed on the fly as needed.
+Covering all historical releases puts technical limitations on the project, that's why this isn't a fully static site.
 
-## Building
 
-Download either Undertale, Deltarune, or Undertale Yellow and extract their scripts using [UndertaleModTool](https://github.com/UnderminersTeam/UndertaleModTool)'s `ExportAllCode.csx` script. The scripts need to be located in `decompiled-{undertale,deltarune,undertaleyellow}` directories. For multi-chapter games (deltarune), use subdirectories for individual chapters' scripts (e.g. `decompiled-deltarune/{ch1,ch2,ch3,ch4,init}`).
+### Timeline
 
-After installing prerequisites, first install required dependencies of the project using `pip install -r requirements.txt`, then build the site using `python3 build.py [game]`. The site is placed by default in the `out/[game]` directory. To view the site after building, (if you have Python installed), run `./dev.sh [game]`. A Bash (or any Linux shell) environment is assumed when running the mentioned commands.
+![Timeline](/static/timeline.gif)
 
-## Disclaimer
+Interactive timeline allows you to visually navigate between different releases. Each square represents a single release, clicking on it opens browse view of that release.
+Clicking on line between releases opens a diff view comparing code between two.
 
-While this repository no longer contains Undertale, Deltarune, or Undertale Yellow code directly, the websites that build out of this repository contain content by Toby Fox, 8-4, Fangamer, Team Undertale Yellow, etc. If you have copyright concerns about this repository, please email [admin@undertale.wiki](mailto:admin@undertale.wiki).
+### Browse
 
-Code of the code viewer itself is licensed under the [MIT license](./LICENSE).
+![Browse](/static/browse.png)
 
-## Credits
+Browse view lists all scripts for a given release. You can use search to find stuff inside the code.
+Scripts contain full source code with additional annotations.
 
-- Toby Fox, et al: Created [Undertale](https://undertale.com/), [Deltarune](https://deltarune.com/) and all the scripts displayed on their respective sites
-- Team Undertale Yellow: Created [Undertale Yellow](https://gamejolt.com/games/UndertaleYellow/136925) and all the scripts displayed on its site
-- [xkeeper](https://github.com/Xkeeper0): Original version
-- [Grossley](https://github.com/Grossley): Adaptation for personal use
-- [Jacky720](https://github.com/Jacky720): Changes to annotations, help with making into a static site
-- [KockaAdmiralac](https://kocka.tech): Rewriting in Python and turning into static sites for wiki use
+### Compare
+
+![Compare](/static/compare.png)
+
+Compare view shows a side-by-side diff between two releases.
+You can filter the results to show only added, modified, removed or renumbered scripts. Renumbered status indicates that the changes are only related to asset IDs.
+
+## Development
+
+The project uses [Bun](https://bun.sh/) for dependency management, package scripts, and its JavaScript runtime.
+
+Install dependencies:
+
+```bash
+bun install --frozen-lockfile
+```
+
+### Running
+
+Start a development server:
+
+```bash
+bun run dev
+```
+
+### Building
+
+Create a production build:
+
+```bash
+bun run build
+```
+
+### Contributing
+
+Run linting, formatting, and type checking before submitting changes:
+
+```bash
+bun run check
+```
+
+## Contributors
+
+- [@DaInfLoop](https://github.com/DaInfLoop) - original project contributor
+- [@ezhevita](https://github.com/ezhevita) - original project contributor
+- [@HushBugger](https://github.com/HushBugger) - original project contributor
+- [@Jacky720](https://github.com/Jacky720) - original project contributor
+- [@jjezewski](https://github.com/jjezewski) - creator & maintainer
+- [@KockaAdmiralac](https://github.com/KockaAdmiralac) - original project contributor
+- [@NotBuildingwalls](https://github.com/NotBuildingwalls) - original project contributor
+- [@RedstoneWizard08](https://github.com/RedstoneWizard08) - original project contributor
+- [@Remex-Remige](https://github.com/Remex-Remige) - original project contributor
+- [@Xkeeper0](https://github.com/Xkeeper0) - original project contributor
+
+## License
+
+This project is licensed under the zlib License. See the [LICENSE](./LICENSE) file for details.
