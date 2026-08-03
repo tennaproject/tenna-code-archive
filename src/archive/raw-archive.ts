@@ -161,7 +161,7 @@ export function parseRawArchiveCatalog(
     if (typeof bytes !== "number" || !Number.isSafeInteger(bytes) || bytes < 1) {
       archiveError(`files.${chapter}`, "has an invalid byte size");
     }
-    if (filename !== "data.win" && filename !== "game.ios") {
+    if (filename !== "data.win" && filename !== "game.ios" && filename !== "game.win") {
       archiveError(`files.${chapter}`, "has an unsupported filename");
     }
     parsedFiles[chapter] = { blob, bytes, filename };

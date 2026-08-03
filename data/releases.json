@@ -141,6 +141,9 @@
     "label": "SURVEY_PROGRAM",
     "directory": "survey_program",
     "singleChapter": "survey_program",
-    "releases": [{ "date": "2018-10-31" }]
+    "releases": [
+      { "date": "2019-02-28", "note": "Switch 1.01" },
+      { "date": "2018-10-31" }
+    ]
   }
 }

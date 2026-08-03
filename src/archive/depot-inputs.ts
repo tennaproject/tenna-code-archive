@@ -11,7 +11,7 @@ async function dataFileExists(file: string): Promise<boolean> {
 }
 
 async function resolveDataFile(directory: string): Promise<string | undefined> {
-  for (const name of ["data.win", "game.ios"]) {
+  for (const name of ["data.win", "game.ios", "game.win"]) {
     const direct = resolve(directory, name);
     if (await dataFileExists(direct)) return direct;
   }
@@ -59,19 +59,19 @@ export async function inputsForDepot(depot: string, singleChapter?: string): Pro
   const root = await resolveDataFile(depot);
   if (singleChapter !== undefined) {
     if (root === undefined) {
-      throw new Error(`Missing data.win or game.ios under ${depot}`);
+      throw new Error(`Missing data.win, game.ios, or game.win under ${depot}`);
     }
     return [{ chapter: singleChapter, dataFile: root }];
   }
   const inputs = await chapterInputs(depot);
   if (inputs.length === 0) {
     if (root === undefined) {
-      throw new Error(`Missing data.win or game.ios under ${depot}`);
+      throw new Error(`Missing data.win, game.ios, or game.win under ${depot}`);
     }
     return [{ chapter: "demo", dataFile: root }];
   }
   if (root === undefined) {
-    throw new Error(`Missing chapter-select data.win or game.ios under ${depot}`);
+    throw new Error(`Missing chapter-select data.win, game.ios, or game.win under ${depot}`);
   }
   return [{ chapter: "init", dataFile: root }, ...inputs];
 }
