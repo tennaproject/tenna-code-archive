@@ -245,11 +245,10 @@ code,
 }
 
 .alarm-preview {
+  order: 1;
   display: block;
-  font-weight: normal;
-  font-style: normal;
-  position: relative;
-  float: right;
+  flex: 0 1 500px;
+  min-width: 0;
   max-width: 500px;
   margin: 0 1em 1em 1em;
   padding: 0.5em 1em;
@@ -257,6 +256,9 @@ code,
   background: var(--alarm-box-background-color);
   box-shadow: var(--shadow-lg);
   color: var(--text-1);
+  font-weight: normal;
+  font-style: normal;
+  position: relative;
   z-index: 10000;
   top: -1.8em;
   box-sizing: border-box;
@@ -264,16 +266,19 @@ code,
 }
 
 .alarm-trigger {
-  float: left;
+  flex: none;
   position: relative;
-  margin-inline-end: 0.4em;
 }
 
 .alarm-arrow {
+  order: 1;
   display: block;
+  flex: 1 1 100px;
+  min-width: 2em;
   position: relative;
-  top: 0.5em;
-  margin: 0 100px 0 0;
+  align-self: center;
+  margin-block: 0;
+  margin-inline: 0.4em 100px;
   height: 2px;
   border-top: 1px dashed var(--alarm-connection-line-color);
   z-index: 10;
@@ -288,10 +293,15 @@ code,
   border-color: var(--alarm-border-color--hover);
 }
 
-.code pre:has(.alarm-reference) {
-  float: left;
+.alarm-reference {
+  display: contents;
+}
+
+.code pre:has(.alarm-reference) > code {
+  display: flex;
   width: 100%;
   height: 1em;
+  align-items: flex-start;
 }
 
 .function-reference {

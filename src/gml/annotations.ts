@@ -295,14 +295,15 @@ async function highlightAlarm(
   if (previous[0] === "." && previous[1]?.toLowerCase() !== "self") {
     return match[0];
   }
-  const alarmNumber = Number(match[3]);
+  const alarmNumber = Number(match[4]);
   const owner = classify(`${currentScriptName}.gml`);
   if (owner.type !== "object") return match[0];
   const scriptName = `${owner.prefix}Alarm_${alarmNumber}`;
   if (!text.has(scriptName)) return match[0];
   return context.renderTemplate("highlight/alarm.html", {
-    alarm_qualifier: match[1] ?? "",
-    alarm_content: match[2] ?? "",
+    alarm_indent: match[1] ?? "",
+    alarm_qualifier: match[2] ?? "",
+    alarm_content: match[3] ?? "",
     script_name: scriptName,
   });
 }
@@ -376,8 +377,10 @@ async function processLine(
   line = await replaceAnnotated(line, /(?<![.\w])(s?cr?_[a-z0-9_]+)\(/gi, (match, code) =>
     highlightFunction(match, text, context, code, carriedCodeTokens),
   );
-  line = await replaceAnnotated(line, /(?<![.\w])(self\.)?(alarm\[(\d+)\])/gi, (match, code) =>
-    highlightAlarm(match, scriptName, text, context, code, carriedCodeTokens),
+  line = await replaceAnnotated(
+    line,
+    /(^\s*)?(?<![.\w])(self\.)?(alarm\[(\d+)\])/gi,
+    (match, code) => highlightAlarm(match, scriptName, text, context, code, carriedCodeTokens),
   );
   return `<code>${protectedHtml.restore(line)}</code>`;
 }
