@@ -4,7 +4,7 @@ import { isDirectory } from "../platform/paths";
 import { extractGameVersion } from "../gml/game-version";
 import type { Build, Catalog, Chapter } from "../shared/catalog";
 import { analyzeChapter, searchUrlForChapter } from "./analyze";
-import type { BuildPlan } from "./plan";
+import type { BuildLog, BuildPlan } from "./plan";
 import {
   assetTablesPath,
   assetTablesUrl,
@@ -24,6 +24,7 @@ export interface CatalogStats {
 interface BuildContext extends RenderContext {
   catalogStats: CatalogStats;
   fingerprint(directory: string): Promise<string>;
+  log?: BuildLog;
 }
 
 interface ArchiveResult {
@@ -33,17 +34,24 @@ interface ArchiveResult {
 }
 
 export async function buildArchive(plan: BuildPlan, context: BuildContext): Promise<ArchiveResult> {
+  const log: BuildLog = context.log ?? (() => {});
   const publicBuilds: Build[] = [];
   const routingChapters: RenderedChapter[] = [];
   const sourcePaths = new Map<string, string>();
   const canonicalChapterIds = new Set<string>();
   const searchTargets = new Set<string>();
 
-  for (const release of plan.releases) {
+  for (const [releaseIndex, release] of plan.releases.entries()) {
+    const releaseLabel =
+      release.label === undefined ? release.id : `${release.label} (${release.id})`;
+    log(`Release ${releaseIndex + 1}/${plan.releases.length}: ${releaseLabel}`);
     const publicChapters: Chapter[] = [];
     for (const [chapterId, chapterLabel] of plan.chapters) {
       const inputDirectory = join(release.root, chapterId);
-      if (!(await isDirectory(inputDirectory))) continue;
+      if (!(await isDirectory(inputDirectory))) {
+        log(`  ${chapterLabel} (${chapterId}): skipped, input not found.`);
+        continue;
+      }
 
       const fingerprint = await context.fingerprint(inputDirectory);
       context.usage.catalog.push({
@@ -56,6 +64,10 @@ export async function buildArchive(plan: BuildPlan, context: BuildContext): Prom
         context.store,
       );
       context.catalogStats[cached ? "cached" : "computed"] += 1;
+      log(
+        `  ${chapterLabel} (${chapterId}): ${analysis.scripts.length} scripts, ` +
+          `catalog ${cached ? "cache hit" : "computed"}.`,
+      );
 
       for (const script of analysis.scripts) {
         if (sourcePaths.has(script.hash)) continue;
@@ -77,7 +89,14 @@ export async function buildArchive(plan: BuildPlan, context: BuildContext): Prom
         search,
         searchTargets,
       });
+      const renderedBefore = context.stats.rendered;
+      const cachedBefore = context.stats.cached;
       const result = await renderChapter(job, context, analysis.index);
+      log(
+        `  ${chapterLabel} (${chapterId}): ` +
+          `${context.stats.rendered - renderedBefore} scripts rendered, ` +
+          `${context.stats.cached - cachedBefore} cached.`,
+      );
       routingChapters.push(result);
 
       publicChapters.push({
@@ -99,6 +118,9 @@ export async function buildArchive(plan: BuildPlan, context: BuildContext): Prom
         publishedAt: release.publishedAt,
         chapters: publicChapters,
       });
+      log(`  Included ${publicChapters.length} chapter(s) in the public catalog.`);
+    } else {
+      log("  No configured chapters found in this release.");
     }
   }
   if (routingChapters.length === 0) {

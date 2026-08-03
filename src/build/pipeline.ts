@@ -9,13 +9,19 @@ import { copyRuntimeAssets } from "./output/assets";
 import { writeCatalogOutputs, writePayloadShards } from "./output/data";
 import { writeRootPages } from "./output/pages";
 import { writeRouting } from "./output/routing";
-import { assertReplaceableOutput, type BuildOptions, type BuildPlan, planBuild } from "./plan";
+import {
+  assertReplaceableOutput,
+  type BuildLog,
+  type BuildOptions,
+  type BuildPlan,
+  planBuild,
+} from "./plan";
 import type { RenderStats } from "./render";
 import { resolveShardPrefixLength } from "./shards";
 import { fingerprintDirectory } from "./stamps";
 import { emptyUsage, openStore } from "./store";
 
-export type { BuildOptions } from "./plan";
+export type { BuildLog, BuildOptions } from "./plan";
 
 interface BuildStats {
   scripts: RenderStats;
@@ -25,6 +31,10 @@ interface BuildStats {
 interface BuildResult {
   output: string;
   stats: BuildStats;
+}
+
+function defaultLog(message: string): void {
+  console.log(message);
 }
 
 async function publishOutput(
@@ -62,7 +72,9 @@ async function publishOutput(
 }
 
 export async function buildDeltarune(options: BuildOptions = {}): Promise<BuildResult> {
+  const log: BuildLog = options.log ?? defaultLog;
   const projectDirectory = resolve(options.projectDirectory ?? projectRoot);
+  log("Preparing build plan...");
   const data = new DeltaruneData(projectDirectory);
   const config = await data.getConfig();
   const renumberOverrides = await data.getRenumberOverrides();
@@ -71,6 +83,13 @@ export async function buildDeltarune(options: BuildOptions = {}): Promise<BuildR
     shard_prefix_length: shardPrefixLength,
   });
   const outputPlan = await planBuild(options, projectDirectory, config);
+  log(
+    `Build plan ready: ${outputPlan.releases.length} releases, ` +
+      `${outputPlan.chapters.length} chapters, ` +
+      `cache ${outputPlan.cache.enabled ? "enabled" : "disabled"}.`,
+  );
+  log(`Output directory: ${outputPlan.outputDirectory}`);
+  if (outputPlan.cache.enabled) log(`Cache directory: ${outputPlan.cache.directory}`);
   await mkdir(dirname(outputPlan.outputDirectory), { recursive: true });
   const transactionDirectory = await mkdtemp(
     join(dirname(outputPlan.outputDirectory), `.${basename(outputPlan.outputDirectory)}-build-`),
@@ -97,9 +116,13 @@ export async function buildDeltarune(options: BuildOptions = {}): Promise<BuildR
     const payloads = new Set<string>();
     try {
       await mkdir(viewerDataDirectory, { recursive: true });
+      log("Copying runtime assets...");
       const assets = await copyRuntimeAssets(plan.projectDirectory, plan.outputDirectory);
+      log(`Runtime assets ready: ${Object.keys(assets).length} fingerprinted assets.`);
+      log("Writing root pages...");
       await writeRootPages(plan.config, assets, plan.outputDirectory, renderTemplate);
 
+      log("Building archive...");
       const archive = await buildArchive(plan, {
         data,
         config,
@@ -112,8 +135,15 @@ export async function buildDeltarune(options: BuildOptions = {}): Promise<BuildR
         usage,
         catalogStats: stats.catalog,
         fingerprint: fingerprintDirectory,
+        log,
       });
 
+      log(
+        `Archive ready: ${archive.catalog.builds.length} builds, ` +
+          `${archive.routingChapters.length} chapters, ${archive.sourcePaths.size} unique sources, ` +
+          `${payloads.size} payloads.`,
+      );
+      log("Writing catalog, payload shards, and routing metadata...");
       await Promise.all([
         writePayloadShards(viewerDataDirectory, payloads, store, usage, shardPrefixLength),
         writeCatalogOutputs(
@@ -138,7 +168,10 @@ export async function buildDeltarune(options: BuildOptions = {}): Promise<BuildR
         ),
       ]);
 
-      if (plan.allChapters && plan.prune) await store.prune(usage);
+      if (plan.allChapters && plan.prune) {
+        log("Pruning stale cache entries...");
+        await store.prune(usage);
+      }
 
       await writeFile(
         join(plan.outputDirectory, ".build-stamp"),
@@ -149,12 +182,14 @@ export async function buildDeltarune(options: BuildOptions = {}): Promise<BuildR
       await store.dispose();
     }
 
+    log("Publishing build output...");
     await publishOutput(
       plan.outputDirectory,
       outputPlan.outputDirectory,
       transactionDirectory,
       publicationState,
     );
+    log("Build output published.");
     return { output: outputPlan.outputDirectory, stats };
   } finally {
     if (!publicationState.preserveTransaction) {

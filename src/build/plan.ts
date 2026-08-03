@@ -12,6 +12,8 @@ import { computeCatalogStamp, computeRenderStamp } from "./stamps";
 
 const GAME_ID = "deltarune";
 
+export type BuildLog = (message: string) => void;
+
 export interface BuildOptions {
   chapter?: string;
   catalogFile?: string;
@@ -22,6 +24,7 @@ export interface BuildOptions {
   cache?: boolean;
   cacheDirectory?: string;
   prune?: boolean;
+  log?: BuildLog;
 }
 
 export interface BuildPlan {
