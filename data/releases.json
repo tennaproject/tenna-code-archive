@@ -33,7 +33,6 @@
     "directory": "deltarune_demo",
     "appId": "1690940",
     "depotId": "1690941",
-    "singleChapter": "demo",
     "releases": [
       {
         "date": "2024-12-09",
@@ -58,46 +57,84 @@
         "date": "2022-06-06",
         "manifest": "2367536887136698437",
         "branch": "chapter1.2.112.windows7fix",
-        "note": "Windows 7 fix"
+        "note": "Windows 7 fix",
+        "singleChapter": "demo"
       },
       {
         "date": "2022-04-14",
         "manifest": "5074858852605134904",
         "branch": "chapter1.2.112.windows7fix",
-        "note": "Windows 7 fix"
+        "note": "Windows 7 fix",
+        "singleChapter": "demo"
       },
       {
         "date": "2022-04-12",
         "manifest": "7551597989642163660",
         "branch": "chapter1.2.112.windows7fix",
-        "note": "Windows 7 fix"
+        "note": "Windows 7 fix",
+        "singleChapter": "demo"
       },
       {
         "date": "2022-04-11",
         "manifest": "6907182482516437783",
         "branch": "chapter1.2.112.windows7fix",
-        "note": "Windows 7 fix"
+        "note": "Windows 7 fix",
+        "singleChapter": "demo"
       },
-      { "date": "2022-02-25", "manifest": "7280478300334929399" },
-      { "date": "2022-02-24", "manifest": "3831195597201285088" },
-      { "date": "2022-02-22", "manifest": "3928884402338717316" },
-      { "date": "2021-09-30", "manifest": "8311763012442684526" },
-      { "date": "2021-09-23", "manifest": "2438050533604741459" },
-      { "date": "2021-09-21", "manifest": "8068723090824935880" },
-      { "date": "2021-09-19", "manifest": "5665575182022562169" },
+      {
+        "date": "2022-02-25",
+        "manifest": "7280478300334929399",
+        "singleChapter": "demo"
+      },
+      {
+        "date": "2022-02-24",
+        "manifest": "3831195597201285088",
+        "singleChapter": "demo"
+      },
+      {
+        "date": "2022-02-22",
+        "manifest": "3928884402338717316",
+        "singleChapter": "demo"
+      },
+      {
+        "date": "2021-09-30",
+        "manifest": "8311763012442684526",
+        "singleChapter": "demo"
+      },
+      {
+        "date": "2021-09-23",
+        "manifest": "2438050533604741459",
+        "singleChapter": "demo"
+      },
+      {
+        "date": "2021-09-21",
+        "manifest": "8068723090824935880",
+        "singleChapter": "demo"
+      },
+      {
+        "date": "2021-09-19",
+        "manifest": "5665575182022562169",
+        "singleChapter": "demo"
+      },
       {
         "id": "2021-09-18-0405",
         "date": "2021-09-18",
         "manifest": "6399680291216263180",
-        "note": "04:05 UTC"
+        "note": "04:05 UTC",
+        "singleChapter": "demo"
       },
       {
         "id": "2021-09-18-0126",
         "date": "2021-09-18",
         "manifest": "3058538026860111700",
-        "note": "01:26 UTC"
+        "note": "01:26 UTC",
+        "singleChapter": "demo"
       },
-      { "date": "2021-09-17", "manifest": "1237260587432546177" }
+      {
+        "date": "2021-09-17",
+        "manifest": "1237260587432546177",
+        "singleChapter": "demo"
+      }
     ]
   },
   "survey-program": {
