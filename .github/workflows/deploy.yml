@@ -4,6 +4,10 @@ on:
     branches: [master]
   workflow_dispatch:
 
+concurrency:
+  group: tenna-production
+  cancel-in-progress: false
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -39,6 +43,26 @@ jobs:
           TENNA_CACHE_ACCESS_KEY_ID: ${{ secrets.TENNA_CACHE_ACCESS_KEY_ID }}
           TENNA_CACHE_SECRET_ACCESS_KEY: ${{ secrets.TENNA_CACHE_SECRET_ACCESS_KEY }}
           TENNA_UTMT_CLI: ${{ github.workspace }}/utmtcli/UndertaleModCli
+      - name: Restore renderer cache
+        id: renderer-cache
+        uses: actions/cache@v6
+        with:
+          path: .cache/deltarune
+          key: tenna-render-${{ runner.os }}-${{ hashFiles('src/build/store.ts') }}-${{ github.sha }}
+          restore-keys: |
+            tenna-render-${{ runner.os }}-${{ hashFiles('src/build/store.ts') }}-
+      - name: Report renderer cache restore
+        env:
+          CACHE_HIT: ${{ steps.renderer-cache.outputs.cache-hit }}
+        run: |
+          case "$CACHE_HIT" in
+            true) result="exact hit" ;;
+            false) result="compatible prefix hit" ;;
+            *) result="miss" ;;
+          esac
+          echo "Renderer cache restore: $result"
+          echo "### Renderer cache" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Restore: $result" >> "$GITHUB_STEP_SUMMARY"
       - name: Build full history
         run: bun run build --gml local/decompiled --prune
       - name: Write public provenance

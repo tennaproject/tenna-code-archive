@@ -1,33 +1,54 @@
-import { mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import {
+  copyFile,
+  link,
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  stat,
+  utimes,
+  writeFile,
+} from "node:fs/promises";
 import { dirname, relative, resolve, sep } from "node:path";
 
-import type { R2ObjectStore } from "./object-store";
-import { parseRawArchiveCatalog, rawBlobKey, rawCatalogKey } from "./raw-archive";
+import type { ObjectStore } from "./object-store";
+import {
+  parseRawArchiveCatalog,
+  rawBlobKey,
+  rawCatalogKey,
+  type RawArchiveCatalog,
+  type RawArchiveFile,
+} from "./raw-archive";
 import type { Release, ReleaseSource } from "./releases";
 import { extractionIdentity, sha256File, type Toolchain } from "./toolchain";
-import { moveExtractedDirectory, publishExtractedDirectory } from "../commands/extract-depot";
+import { publishExtractedDirectory } from "../commands/extract-depot";
 import { run, runOutput } from "../platform/spawn";
 
-interface GmlPreparationSelection {
+export interface GmlPreparationSelection {
   source: ReleaseSource;
   releases: Release[];
 }
 
-interface GmlPreparationOptions {
+export interface GmlPreparationOptions {
   archivePrefix: string;
   cachePrefix: string;
   outputRoot: string;
   utmtCli: string;
   exportScript: string;
   toolchain: Toolchain;
+  jobs?: number;
   dryRun?: boolean;
   log?: (message: string) => void;
 }
 
-interface GmlPreparationResult {
-  chapters: number;
-  hits: number;
+export interface GmlPreparationResult {
+  references: number;
+  uniquePackages: number;
+  cacheHits: number;
   rebuilt: number;
+  corrupt: number;
+  localReuses: number;
 }
 
 function gmlCacheKey(prefix: string, toolchain: Toolchain, rawHash: string): string {
@@ -121,9 +142,50 @@ async function validCacheDirectory(directory: string, identity: string): Promise
   }
 }
 
+function errorCode(error: unknown): string | undefined {
+  if (typeof error !== "object" || error === null || !("code" in error)) return undefined;
+  return typeof error.code === "string" ? error.code : undefined;
+}
+
+const LINK_FALLBACK_ERRORS = new Set(["EACCES", "EPERM", "EXDEV", "ENOTSUP", "EOPNOTSUPP"]);
+
+interface MaterializeOperations {
+  link: typeof link;
+  copyFile: typeof copyFile;
+  stat: typeof stat;
+  utimes: typeof utimes;
+}
+
+const MATERIALIZE_OPERATIONS: MaterializeOperations = { link, copyFile, stat, utimes };
+
+export async function materializeCacheDirectory(
+  source: string,
+  destination: string,
+  operations: MaterializeOperations = MATERIALIZE_OPERATIONS,
+): Promise<void> {
+  await mkdir(destination, { recursive: true });
+  for (const entry of await readdir(source, { withFileTypes: true })) {
+    const sourcePath = resolve(source, entry.name);
+    const destinationPath = resolve(destination, entry.name);
+    if (entry.isDirectory()) {
+      await materializeCacheDirectory(sourcePath, destinationPath, operations);
+      continue;
+    }
+    if (!entry.isFile()) throw new Error(`Unsupported cache package entry: ${sourcePath}`);
+    try {
+      await operations.link(sourcePath, destinationPath);
+    } catch (error) {
+      if (!LINK_FALLBACK_ERRORS.has(errorCode(error) ?? "")) throw error;
+      const sourceInfo = await operations.stat(sourcePath);
+      await operations.copyFile(sourcePath, destinationPath);
+      await operations.utimes(destinationPath, sourceInfo.atime, sourceInfo.mtime);
+    }
+  }
+}
+
 async function buildChapter(
-  archiveStore: R2ObjectStore,
-  cacheStore: R2ObjectStore,
+  archiveStore: ObjectStore,
+  cacheStore: ObjectStore,
   rawKey: string,
   rawHash: string,
   expectedBytes: number,
@@ -167,102 +229,257 @@ async function buildChapter(
   return verification;
 }
 
-export async function prepareGml(
-  archiveStore: R2ObjectStore,
-  cacheStore: R2ObjectStore,
+interface ReleasePlan {
+  source: ReleaseSource;
+  release: Release;
+  catalog: RawArchiveCatalog;
+  destination: string;
+  staging?: string;
+}
+
+interface PackageConsumer {
+  release: ReleasePlan;
+  chapter: string;
+}
+
+interface PackagePlan {
+  identity: string;
+  key: string;
+  rawHash: string;
+  file: RawArchiveFile;
+  consumers: PackageConsumer[];
+  message?: string;
+}
+
+async function preparationPlans(
+  archiveStore: ObjectStore,
   selections: GmlPreparationSelection[],
   options: GmlPreparationOptions,
-): Promise<GmlPreparationResult> {
-  const result = { chapters: 0, hits: 0, rebuilt: 0 };
-  const log = options.log ?? console.log;
-  for (const { source, releases } of selections) {
-    for (const release of releases) {
+): Promise<{ releases: ReleasePlan[]; packages: PackagePlan[] }> {
+  const releases: ReleasePlan[] = [];
+  const packages = new Map<string, PackagePlan>();
+  for (const { source, releases: selectedReleases } of selections) {
+    for (const release of selectedReleases) {
       const catalogKey = rawCatalogKey(options.archivePrefix, source.id, release.id);
       const catalog = parseRawArchiveCatalog(
         JSON.parse(await archiveStore.readText(catalogKey)),
         source,
         release,
       );
-      const destination = resolve(options.outputRoot, source.directory, release.id);
-      if (options.dryRun === true) {
-        for (const [chapter, file] of Object.entries(catalog.files)) {
-          const rawHash = file.blob.slice(7);
-          const key = gmlCacheKey(options.cachePrefix, options.toolchain, rawHash);
-          log(
-            `${(await cacheStore.exists(key)) ? "Cache hit" : "Would rebuild"} ${source.id} ${release.id} ${chapter}`,
-          );
-          result.chapters += 1;
-        }
-        continue;
-      }
-
-      await mkdir(dirname(destination), { recursive: true });
-      const staging = await mkdtemp(resolve(dirname(destination), `.${release.id}-gml-`));
-      try {
-        for (const [chapter, file] of Object.entries(catalog.files)) {
-          result.chapters += 1;
-          const rawHash = file.blob.slice(7);
-          const identity = extractionIdentity(options.toolchain, rawHash);
-          const key = gmlCacheKey(options.cachePrefix, options.toolchain, rawHash);
-          const working = await mkdtemp(resolve(staging, `.${chapter}-`));
-          let exported: string | undefined;
-          try {
-            if (await cacheStore.exists(key)) {
-              const archive = resolve(working, "cached.tar.zst");
-              try {
-                await cacheStore.download(key, archive);
-                const restored = resolve(working, "restored");
-                await unpack(archive, restored);
-                if (!(await validCacheDirectory(restored, identity))) throw new Error("bad marker");
-                exported = restored;
-                result.hits += 1;
-                log(`Cache hit ${source.id} ${release.id} ${chapter}`);
-              } catch {
-                log(`Rebuilding corrupt cache ${source.id} ${release.id} ${chapter}`);
-              }
-            }
-            if (exported === undefined) {
-              exported = await buildChapter(
-                archiveStore,
-                cacheStore,
-                rawBlobKey(options.archivePrefix, rawHash),
-                rawHash,
-                file.bytes,
-                file.filename,
-                key,
-                identity,
-                working,
-                options,
-              );
-              result.rebuilt += 1;
-              log(`Rebuilt ${source.id} ${release.id} ${chapter}`);
-            }
-            await moveExtractedDirectory(exported, resolve(staging, chapter));
-          } finally {
-            await rm(working, { recursive: true, force: true });
+      const releasePlan: ReleasePlan = {
+        source,
+        release,
+        catalog,
+        destination: resolve(options.outputRoot, source.directory, release.id),
+      };
+      releases.push(releasePlan);
+      for (const [chapter, file] of Object.entries(catalog.files)) {
+        const rawHash = file.blob.slice(7);
+        const identity = extractionIdentity(options.toolchain, rawHash);
+        const existing = packages.get(identity);
+        if (existing !== undefined) {
+          if (existing.file.bytes !== file.bytes || existing.file.filename !== file.filename) {
+            throw new Error(
+              `Conflicting metadata for raw blob sha256:${rawHash}: ` +
+                `${existing.file.filename} (${existing.file.bytes} bytes) and ` +
+                `${file.filename} (${file.bytes} bytes)`,
+            );
           }
+          existing.consumers.push({ release: releasePlan, chapter });
+          continue;
         }
-        await writeFile(
-          resolve(staging, ".complete.json"),
-          `${JSON.stringify(
-            {
-              schemaVersion: 1,
-              source: source.id,
-              release: release.id,
-              toolchain: options.toolchain,
-              inputs: Object.fromEntries(
-                Object.entries(catalog.files).map(([chapter, file]) => [chapter, file.blob]),
-              ),
-            },
-            undefined,
-            2,
-          )}\n`,
-        );
-        await publishExtractedDirectory(staging, destination);
-      } finally {
-        await rm(staging, { recursive: true, force: true });
+        packages.set(identity, {
+          identity,
+          key: gmlCacheKey(options.cachePrefix, options.toolchain, rawHash),
+          rawHash,
+          file,
+          consumers: [{ release: releasePlan, chapter }],
+        });
       }
     }
   }
-  return result;
+  return { releases, packages: [...packages.values()] };
+}
+
+async function workerPool<T>(
+  values: T[],
+  jobs: number,
+  worker: (value: T) => Promise<void>,
+): Promise<void> {
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(jobs, values.length) }, async () => {
+      while (next < values.length) {
+        const value = values[next++];
+        if (value !== undefined) await worker(value);
+      }
+    }),
+  );
+}
+
+function packageLabel(packagePlan: PackagePlan): string {
+  const first = packagePlan.consumers[0];
+  if (first === undefined) return packagePlan.rawHash;
+  const suffix =
+    packagePlan.consumers.length === 1 ? "" : ` (${packagePlan.consumers.length} references)`;
+  return `${first.release.source.id} ${first.release.release.id} ${first.chapter}${suffix}`;
+}
+
+function logSummary(
+  result: GmlPreparationResult,
+  log: (message: string) => void,
+  dryRun: boolean,
+  wouldRebuild = 0,
+): void {
+  log(
+    `${dryRun ? "GML dry run" : "GML prepared"}: ${result.references} references, ` +
+      `${result.uniquePackages} unique packages`,
+  );
+  log(
+    dryRun
+      ? `R2: ${result.cacheHits} hits, ${wouldRebuild} would rebuild`
+      : `R2: ${result.cacheHits} hits, ${result.rebuilt} rebuilt, ${result.corrupt} corrupt`,
+  );
+  log(`Local reuse: ${result.localReuses} references`);
+}
+
+export async function prepareGml(
+  archiveStore: ObjectStore,
+  cacheStore: ObjectStore,
+  selections: GmlPreparationSelection[],
+  options: GmlPreparationOptions,
+): Promise<GmlPreparationResult> {
+  const jobs = options.jobs ?? 2;
+  if (!Number.isSafeInteger(jobs) || jobs < 1)
+    throw new Error("GML preparation jobs must be positive");
+  const log = options.log ?? console.log;
+  const plans = await preparationPlans(archiveStore, selections, options);
+  const result: GmlPreparationResult = {
+    references: plans.packages.reduce(
+      (total, packagePlan) => total + packagePlan.consumers.length,
+      0,
+    ),
+    uniquePackages: plans.packages.length,
+    cacheHits: 0,
+    rebuilt: 0,
+    corrupt: 0,
+    localReuses: plans.packages.reduce(
+      (total, packagePlan) => total + packagePlan.consumers.length - 1,
+      0,
+    ),
+  };
+
+  if (options.dryRun === true) {
+    let wouldRebuild = 0;
+    await workerPool(plans.packages, jobs, async (packagePlan) => {
+      if (await cacheStore.exists(packagePlan.key)) {
+        result.cacheHits += 1;
+        packagePlan.message = `R2 cache hit ${packageLabel(packagePlan)}`;
+      } else {
+        wouldRebuild += 1;
+        packagePlan.message = `Would rebuild ${packageLabel(packagePlan)}`;
+      }
+    });
+    for (const packagePlan of plans.packages) log(packagePlan.message ?? packageLabel(packagePlan));
+    logSummary(result, log, true, wouldRebuild);
+    return result;
+  }
+
+  await mkdir(dirname(options.outputRoot), { recursive: true });
+  const workRoot = await mkdtemp(resolve(dirname(options.outputRoot), ".gml-prepare-"));
+  try {
+    for (const release of plans.releases) {
+      await mkdir(dirname(release.destination), { recursive: true });
+      release.staging = await mkdtemp(
+        resolve(dirname(release.destination), `.${release.release.id}-gml-`),
+      );
+    }
+
+    await workerPool(plans.packages, jobs, async (packagePlan) => {
+      const working = await mkdtemp(resolve(workRoot, ".package-"));
+      try {
+        let exported: string | undefined;
+        let cacheHit = false;
+        let wasCorrupt = false;
+        if (await cacheStore.exists(packagePlan.key)) {
+          const archive = resolve(working, "cached.tar.zst");
+          await cacheStore.download(packagePlan.key, archive);
+          try {
+            const restored = resolve(working, "restored");
+            await unpack(archive, restored);
+            if (!(await validCacheDirectory(restored, packagePlan.identity))) {
+              throw new Error("bad marker");
+            }
+            exported = restored;
+            cacheHit = true;
+            result.cacheHits += 1;
+          } catch {
+            wasCorrupt = true;
+            result.corrupt += 1;
+          }
+        }
+        if (exported === undefined) {
+          exported = await buildChapter(
+            archiveStore,
+            cacheStore,
+            rawBlobKey(options.archivePrefix, packagePlan.rawHash),
+            packagePlan.rawHash,
+            packagePlan.file.bytes,
+            packagePlan.file.filename,
+            packagePlan.key,
+            packagePlan.identity,
+            working,
+            options,
+          );
+          result.rebuilt += 1;
+        }
+        for (const consumer of packagePlan.consumers) {
+          if (consumer.release.staging === undefined) throw new Error("Missing release staging");
+          await materializeCacheDirectory(
+            exported,
+            resolve(consumer.release.staging, consumer.chapter),
+          );
+        }
+        packagePlan.message = cacheHit
+          ? `R2 cache hit ${packageLabel(packagePlan)}`
+          : `${wasCorrupt ? "Rebuilt corrupt cache" : "Rebuilt"} ${packageLabel(packagePlan)}`;
+      } finally {
+        await rm(working, { recursive: true, force: true });
+      }
+    });
+
+    for (const packagePlan of plans.packages) log(packagePlan.message ?? packageLabel(packagePlan));
+    for (const release of plans.releases) {
+      if (release.staging === undefined) throw new Error("Missing release staging");
+      await writeFile(
+        resolve(release.staging, ".complete.json"),
+        `${JSON.stringify(
+          {
+            schemaVersion: 1,
+            source: release.source.id,
+            release: release.release.id,
+            toolchain: options.toolchain,
+            inputs: Object.fromEntries(
+              Object.entries(release.catalog.files).map(([chapter, file]) => [chapter, file.blob]),
+            ),
+          },
+          undefined,
+          2,
+        )}\n`,
+      );
+      await publishExtractedDirectory(release.staging, release.destination);
+      release.staging = undefined;
+    }
+    logSummary(result, log, false);
+    return result;
+  } finally {
+    await Promise.all(
+      plans.releases.map(async (release) => {
+        if (release.staging !== undefined) {
+          await rm(release.staging, { recursive: true, force: true });
+        }
+      }),
+    );
+    await rm(workRoot, { recursive: true, force: true });
+  }
 }

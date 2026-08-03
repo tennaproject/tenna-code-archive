@@ -7,6 +7,13 @@ export interface R2Credentials {
   secretAccessKey: string;
 }
 
+export interface ObjectStore {
+  exists(key: string): Promise<boolean>;
+  readText(key: string): Promise<string>;
+  download(key: string, destination: string): Promise<void>;
+  upload(key: string, source: string, contentType: string): Promise<void>;
+}
+
 export function r2CredentialsFromEnvironment(prefix: string): R2Credentials {
   const endpoint = process.env.TENNA_R2_ENDPOINT;
   const accessKeyId = process.env[`${prefix}_ACCESS_KEY_ID`];
@@ -24,7 +31,7 @@ export function r2CredentialsFromEnvironment(prefix: string): R2Credentials {
   return { endpoint, accessKeyId, secretAccessKey };
 }
 
-export class R2ObjectStore {
+export class R2ObjectStore implements ObjectStore {
   client: Bun.S3Client;
 
   constructor(bucket: string, credentials: R2Credentials) {

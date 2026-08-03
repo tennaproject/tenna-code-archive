@@ -12,6 +12,7 @@ interface Options {
   source?: string;
   release?: string;
   outputRoot: string;
+  jobs: number;
   dryRun: boolean;
 }
 
@@ -20,6 +21,7 @@ function parseOptions(args: string[]): Options {
     archiveBucket: "tenna-archive",
     cacheBucket: "tenna-cache",
     outputRoot: resolve(projectRoot, "local", "decompiled"),
+    jobs: 2,
     dryRun: false,
   };
   for (let index = 0; index < args.length; index += 1) {
@@ -35,7 +37,12 @@ function parseOptions(args: string[]): Options {
     else if (option === "--source") options.source = value;
     else if (option === "--release") options.release = value;
     else if (option === "--output-root") options.outputRoot = resolve(value);
-    else throw new Error(`Unknown option: ${option}`);
+    else if (option === "--jobs") {
+      options.jobs = Number(value);
+      if (!Number.isSafeInteger(options.jobs) || options.jobs < 1) {
+        throw new Error("--jobs must be a positive integer");
+      }
+    } else throw new Error(`Unknown option: ${option}`);
   }
   return options;
 }
@@ -65,6 +72,7 @@ async function main(args: string[]): Promise<void> {
       utmtCli: utmtCli(),
       exportScript: resolve(projectRoot, "scripts", "ExportCodeFormatted.csx"),
       toolchain: await loadToolchain(),
+      jobs: options.jobs,
       dryRun: options.dryRun,
     },
   );
