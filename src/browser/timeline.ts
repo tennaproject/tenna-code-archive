@@ -383,6 +383,13 @@ function syncScrollbarWidth(): void {
   scrollbar.hidden = timelineScroll.scrollWidth <= timelineScroll.clientWidth;
 }
 
+function syncRelationshipClip(): void {
+  canvas.style.setProperty(
+    "--timeline-relationship-clip-start",
+    `${Math.max(0, timelineScroll.scrollLeft)}px`,
+  );
+}
+
 let syncingScroll = false;
 
 function mirrorScroll(from: HTMLElement, to: HTMLElement): void {
@@ -395,6 +402,7 @@ function mirrorScroll(from: HTMLElement, to: HTMLElement): void {
 }
 
 timelineScroll.addEventListener("scroll", () => {
+  syncRelationshipClip();
   mirrorScroll(timelineScroll, scrollbar);
 });
 scrollbar.addEventListener("scroll", () => {

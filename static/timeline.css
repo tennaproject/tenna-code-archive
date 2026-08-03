@@ -324,13 +324,14 @@
   z-index: 1;
   width: calc(var(--release-count) * var(--timeline-column-width));
   height: calc(var(--timeline-row-count) * var(--timeline-row-height));
+  clip-path: inset(0 0 0 var(--timeline-relationship-clip-start, 0px));
   overflow: visible;
   pointer-events: none;
 }
 
 .timeline-relationships path {
   fill: none;
-  stroke: color-mix(in oklch, var(--text-3) 80%, transparent);
+  stroke: color-mix(in oklch, var(--red) 50%, transparent);
   stroke-dasharray: 5 5;
   stroke-linecap: butt;
   stroke-linejoin: miter;
